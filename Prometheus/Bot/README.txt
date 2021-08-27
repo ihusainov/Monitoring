@@ -1,4 +1,4 @@
-#Prometheus bot
+Prometheus bot
 
 Get prometheus bot from https://github.com/inCaller/prometheus_bot
 Create folder "/etc/prometheus_bot"
