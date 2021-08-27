@@ -1,0 +1,38 @@
+{{ $length := len .GroupLabels -}} {{ if ne $length 0 }}
+
+<b>MyCompany</b>
+
+{{ range $key,$val := .GroupLabels -}}
+    {{$key}} = <code>{{$val}}</code>
+{{ end -}}
+{{ end -}}
+
+{{if eq .Status "firing"}}
+Status: <b>{{.Status | str_UpperCase}} 🔥</b>
+{{end -}}
+
+{{if eq .Status "resolved"}}
+Status: <b>{{.Status | str_UpperCase}} ✅</b>
+{{end }}
+
+<b>Alert List:</b>
+{{- range $val := .Alerts }}
+{{$severity := index $val.Labels "severity" -}}
+{{if eq $severity "Warning" -}}
+Severity: {{$severity | str_Title}} ⚠️
+{{else if eq $severity "Critical" -}}
+Severity: {{$severity | str_Title}} 🚨
+{{else -}}
+
+Severity: {{$severity | str_Title}}
+{{ end -}}
+
+Active from: {{ $val.StartsAt | str_FormatDate }}
+
+{{ range $key, $value := $val.Annotations -}}
+{{ if and (and (ne $key "name") (ne $key "value")) (ne $key "measureUnit") }}
+
+{{$key | str_Title }}: {{$value}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
