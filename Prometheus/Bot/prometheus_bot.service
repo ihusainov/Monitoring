@@ -1,0 +1,14 @@
+# Replace this file into folder "/etc/systemd/system/" with name "prometheus_bot.service"
+[Unit]
+Description=Prometheus Bot
+After=network.target
+
+[Service]
+Type=simple
+Restart=always
+User=prometheus
+Group=prometheus
+ExecStart=/usr/local/bin/prometheus_bot -c /etc/prometheus_bot/config.yaml -t /etc/prometheus_bot/template.yaml
+
+[Install]
+WantedBy=multi-user.target
