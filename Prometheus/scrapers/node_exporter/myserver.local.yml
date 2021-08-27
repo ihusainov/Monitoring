@@ -1,0 +1,7 @@
+- targets:
+  - "myserver.local:9100"
+  labels:
+    "alias":  "myserver.local"
+    "environment":  "prod"
+        
+# vim: ts=2 sw=2 
