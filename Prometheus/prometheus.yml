@@ -1,0 +1,165 @@
+# In folder /etc/prometheus create new folder "scrapers" and subfolder for all exporters like "node_exporter"
+# In all subfolders like "node_exporter" you need create files for you instance fore example "myserver.yml"
+# With content:
+#- targets:
+#  - "myserver.local:9100"
+#  labels:
+#    "alias":  "myserver.local"
+#    "environment":  "prod"
+
+global:
+  scrape_interval: 30s
+  evaluation_interval:  30s
+  scrape_timeout: 29s
+
+scrape_configs:
+  - job_name: 'node_exporter'
+    file_sd_configs:
+      - files:
+        - /etc/prometheus/scrapers/node_exporter/*.yml
+    relabel_configs:
+      - source_labels:  [__address__]
+        regex:  '([^:]*)(:\d+)?'
+        replacement:  '$1'
+        target_label: alias
+
+  - job_name: 'postfix_exporter'
+    file_sd_configs:
+      - files:
+        - /etc/prometheus/scrapers/postfix_exporter/*.yml
+    relabel_configs:
+      - source_labels:  [__address__]
+        regex:  '([^:]*)(:\d+)?'
+        replacement:  '$1'
+        target_label: alias
+
+  - job_name: 'win_exporter'
+    metrics_path: /metrics
+    file_sd_configs:
+      - files:
+        - /etc/prometheus/scrapers/win_exporter/*.yml
+    relabel_configs:
+      - source_labels:  [__address__]
+        regex:  '([^:]*)(:\d+)?'
+        replacement:  '$1'
+        target_label: alias
+
+  - job_name: 'icmp_ping'
+    scrape_timeout: 5s
+    metrics_path: /probe
+    params:
+      module: [icmp]
+    file_sd_configs:
+      - files:
+        - /etc/prometheus/scrapers/node_exporter/*.yml
+    relabel_configs:
+      - source_labels:  [__address__]
+        regex:  '([^:]*)(:\d+)?'
+        replacement:  '$1'
+        target_label: __param_target
+      - source_labels:  [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement:  127.0.0.1:9115
+
+  - job_name: 'sftp'
+    scrape_timeout: 10s
+    metrics_path: /probe
+    params:
+      module: [ssh_banner]
+    static_configs:
+      - targets:
+        - 192.168.0.10
+    relabel_configs:
+      - source_labels: [__address__]
+        regex: (.*?)(:.*)? 
+        replacement: ${1}:22
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: 127.0.0.1:9115
+  
+  - job_name: 'http_2xx'
+    scrape_timeout: 15s
+    metrics_path: /probe
+    params:
+      module: [http_2xx]
+    file_sd_configs:
+      - files:
+        - /etc/prometheus/scrapers/http_2xx/*.yml
+    relabel_configs:
+      - source_labels:  [__address__]
+        regex:  '([^:]*)(:\d+)?'
+        replacement:  '$1'
+        target_label: __param_target
+      - source_labels:  [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement:  127.0.0.1:9115
+
+  - job_name: 'prometheus'
+    file_sd_configs:
+      - files:
+        - /etc/prometheus/scrapers/prometheus/*.yml
+    relabel_configs:
+      - source_labels:  [__address__]
+        regex:  '([^:]*)(:\d+)?'
+        replacement:  '$1'
+        target_label: alias
+
+  - job_name: 'postgres_exporter'
+    file_sd_configs:
+      - files:
+        - /etc/prometheus/scrapers/postgres_exporter/*.yml
+    relabel_configs:
+      - source_labels:  [__address__]
+        regex:  '([^:]*)(:\d+)?'
+        replacement:  '$1'
+        target_label: alias
+
+  - job_name: 'pgpool'
+    file_sd_configs:
+      - files:
+        - /etc/prometheus/scrapers/pgpool_exporter/*.yml
+    relabel_configs:
+      - source_labels:  [__address__]
+        regex:  '([^:]*)(:\d+)?'
+        replacement:  '$1'
+        target_label: alias
+
+  - job_name: 'nginx'
+    file_sd_configs:
+      - files:
+        - /etc/prometheus/scrapers/nginx/*.yml
+    relabel_configs:
+      - source_labels:  [__address__]
+        regex:  '([^:]*)(:\d+)?'
+        replacement:  '$1'
+        target_label: alias
+
+  - job_name: 'jira'
+    scheme: http
+    params: 
+      token:  ['Fdd45ADWLI32WWsb6UZS4lT7cpLK57']
+    metrics_path: '/plugins/servlet/prometheus/metrics'
+    file_sd_configs:
+      - files:
+        - /etc/prometheus/scrapers/jira/*.yml
+    relabel_configs:
+      - source_labels:  [__address__]
+        regex:  '([^:]*)(:\d+)?'
+        replacement:  '$1'
+        target_label: alias
+
+
+rule_files:
+  - /etc/prometheus/alert.rules.yml
+
+alerting:
+  alertmanagers:
+  - static_configs:
+    - targets:
+      - 'localhost:9093'
+
+# vim: ts=2 sw=2 autoindent 
