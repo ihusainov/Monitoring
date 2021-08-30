@@ -1,6 +1,8 @@
-Name              ELK-nginx
-
 **If you use TLS certificate in ELK you need next settings**
+
+```
+Name              ELK-nginx
+```
 
 **HTTP**
 ```
