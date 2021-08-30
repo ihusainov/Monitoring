@@ -82,7 +82,6 @@ setcap cap_net_raw=+ep /usr/local/sbin/blackbox_exporter
   file_sd_configs:
     - files:
       - /etc/prometheus/scrapers/node_exporter/*.yml
-      - /etc/prometheus/scrapers/node_exporter/*.yaml
   relabel_configs:
     - source_labels:  [__address__]
       regex:  '([^:]*)(:\d+)?'
@@ -107,7 +106,6 @@ setcap cap_net_raw=+ep /usr/local/sbin/blackbox_exporter
   file_sd_configs:
     - files:
       - /etc/prometheus/scrapers/http_2xx/*.yml
-      - /etc/prometheus/scrapers/http_2xx/*.yaml
   relabel_configs:
     - source_labels:  [__address__]
       target_label: __param_target
@@ -129,9 +127,9 @@ setcap cap_net_raw=+ep /usr/local/sbin/blackbox_exporter
 Где:
 
 в targets указывается адрес который будет опрашиваться
-site - имя опрашиваемого ресурса, иногда сайты имеют специальные url для мониторинга, но вот отображать такие url в grafana не в совсем удобно, поэтому добавляется метка site, которая содержит более удобочитаемое значение. Например: target - https://site.domain.com/api/health?key=securekey, тогда site удобно указать как https://site.domain.com
+site - имя опрашиваемого ресурса, иногда сайты имеют специальные url для мониторинга, но вот отображать такие url в grafana не совсем удобно, поэтому добавляется метка site, которая содержит более удобочитаемое значение. Например: target - https://site.domain.com/api/health?key=securekey, тогда site удобно указать как https://site.domain.com
 project - имя проекта к которому относится наблюдаемый ресурс
-category - категория к которому относится наблюдаемый ресурс: customer, internal,public и тд
+category - категория к которому относится наблюдаемый ресурс: customer, internal, public и тд
 dc - датацентр в котором находится наблюдаемый ресурс
 конечно добавить метки можно и другие 
 ```
@@ -148,7 +146,7 @@ dc - датацентр в котором находится наблюдаем�
     summary: "Http resource {{ $labels.site }} not available"
     description: "Ресурс {{ $labels.site }} не доступен по http более 5 минут"
 
-#Проблемы в датацентре
+# Проблемы в датацентре
 - alert: "All http resources in dc not available"
   expr: count(probe_success{job="http_2xx"}) by (dc) - count(probe_success{job="http_2xx"}==0) by (dc) == 0
   for: 5m
